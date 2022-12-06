@@ -16,7 +16,8 @@ json_data = json.loads(requests.post(url=apiUrl, json=data, headers=headers).tex
 # r = requests.post(url=apiUrl, json=data, headers=headers) # make request
 # pprint.pprint(r.json())
 
-df = pd.json_normalize(json_data['data']['boards'][0]['items'],record_path='column_values',meta=['name'])
+data = [ [item['name']]+[c_v['text'] for c_v in item['column_values']] for item in json_data['data']['boards'][0]['items']]
+df = pd.DataFrame(data,columns=['name','Person','Status','Date'])
 
 print(df)
 # json_response = r.json
