@@ -15,24 +15,23 @@ json_data = json.loads(requests.post(url=apiUrl, json=data, headers=headers).tex
 
 # source: https://stackoverflow.com/questions/68076059/normalize-monday-com-api-json-output-in-python
 data = [ [item['name']]+[c_v['text'] for c_v in item['column_values']] for item in json_data['data']['boards'][0]['items']]
-df = pd.DataFrame(data,columns=['name','Person','Status','Date'])
-
-print(df)
-# json_response = r.json
-
-# counter = Counter([item['Status'] for item in df])
-
-# print(counter["Get Intro"])
+df = pd.DataFrame(data,columns=['Deals','Person','Status','Date'])
+df = df.reset_index()
 
 intial_dd_count = df['Status'].str.contains('Initial DD').sum()
 get_intro_count = df['Status'].str.contains('Get Intro').sum()
 opinion_count = df['Status'].str.contains('Need 2nd Opinion').sum()
 schedule_call_count = df['Status'].str.contains('Schedule Call').sum()
 
-def printer():
+def general_overview_print():
+    print("\n\033[4mGeneral Overview\033[0m")
     print(f"Initial DD Count: {intial_dd_count}")
     print(f"Get Intro Count: {get_intro_count}")
     print(f"2nd Opinion Count: {opinion_count}")
-    print(f"Schedule Call Count: {schedule_call_count}")
+    print(f"Schedule Call Count: {schedule_call_count}\n")
 
-print(printer())
+print(general_overview_print())
+
+groups = df.groupby("Person")
+mapping = {name: group["Deals"] for name, group in groups}
+print(mapping)
