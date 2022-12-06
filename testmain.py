@@ -13,16 +13,26 @@ data = {'query' : query2}
 
 json_data = json.loads(requests.post(url=apiUrl, json=data, headers=headers).text)
 
-# r = requests.post(url=apiUrl, json=data, headers=headers) # make request
-# pprint.pprint(r.json())
-
+# source: https://stackoverflow.com/questions/68076059/normalize-monday-com-api-json-output-in-python
 data = [ [item['name']]+[c_v['text'] for c_v in item['column_values']] for item in json_data['data']['boards'][0]['items']]
 df = pd.DataFrame(data,columns=['name','Person','Status','Date'])
 
 print(df)
 # json_response = r.json
 
-# counter = Counter([item['status'] for item in json_response])
+# counter = Counter([item['Status'] for item in df])
 
-# print(counter["Initial DD"])
+# print(counter["Get Intro"])
 
+intial_dd_count = df['Status'].str.contains('Initial DD').sum()
+get_intro_count = df['Status'].str.contains('Get Intro').sum()
+opinion_count = df['Status'].str.contains('Need 2nd Opinion').sum()
+schedule_call_count = df['Status'].str.contains('Schedule Call').sum()
+
+def printer():
+    print(f"Initial DD Count: {intial_dd_count}")
+    print(f"Get Intro Count: {get_intro_count}")
+    print(f"2nd Opinion Count: {opinion_count}")
+    print(f"Schedule Call Count: {schedule_call_count}")
+
+print(printer())
