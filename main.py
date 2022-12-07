@@ -1,76 +1,109 @@
-# import telegram
-# from monday import MondayClient
+import requests
+import json
+import pandas as pd
+from collections import defaultdict
+from config import apiKey, apiUrl
 
-# # Set up telegram bot
-# bot = telegram.Bot(token='5910533175:AAHLIQvzwTut8ISC0WfMuy7VS5BuaZM8vy0')
+# Import core data
 
-# # Set up Monday.com client
-# # monday = MondayClient(api_key='') does not work
-# monday = MondayClient('eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjIwNTEwMjMyMywidWlkIjozNzEwMjA4OSwiaWFkIjoiMjAyMi0xMi0wNVQyMjoxNzo1OS4wNDlaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTQzNjU4NTEsInJnbiI6InVzZTEifQ.Lz7fOIv3WG1iGxkeNrSo4n1xz0q2Vt--5y9ZvVhA2cc')
+headers = {"Authorization" : apiKey}
 
-# monday.items.create_item(board_id='12345678', group_id='today',  item_name='Do a thing')
+query2 = '{boards(limit:1) { name id description items { name column_values{title id type text } } } }'
+data = {'query' : query2}
 
-# monday.items.fetch_items_by_column_value(board_id, column_id, value)
-# # Handle user input
-# def handle_input(update):
-#   text = update.message.text
-#   user_id = update.message.from_user.id
+json_data = json.loads(requests.post(url=apiUrl, json=data, headers=headers).text)
 
-#   # Parse user input and determine action to take
-#   if text == '/create_task':
-#     create_task(user_id)
-#   elif text == '/view_board':
-#     view_board(user_id)
+# source: https://stackoverflow.com/questions/68076059/normalize-monday-com-api-json-output-in-python
+data = [ [item['name']]+[c_v['text'] for c_v in item['column_values']] for item in json_data['data']['boards'][0]['items']]
+df = pd.DataFrame(data,columns=['Deals','Person','Status','Date'])
 
-# # Create a new task on Monday.com
-# def create_task(user_id):
-#   # Get user's workspace and board id
-#   workspace = monday.workspaces.get_workspaces()
-#   board_id = workspace[0]['boards'][0]['id']
 
-#   # Create the new task
-#   task_name = 'New Task'
-#   task = monday.items.create_item(board_id, task_name)
+###########################################################
 
-#   # Send confirmation message to user
-#   bot.send_message(chat_id=user_id, text="Task created successfully!")
+# General Statistics
 
-# # View the user's Monday.com board
-# def view_board(user_id):
-#   # Get user's workspace and board id
-#   workspace = monday.workspaces.get_workspaces()
-#   board_id = workspace[0]['boards'][0]['id']
+intial_dd_count = df['Status'].str.contains('Initial DD').sum()
+get_intro_count = df['Status'].str.contains('Get Intro').sum()
+opinion_count = df['Status'].str.contains('Need 2nd Opinion').sum()
+schedule_call_count = df['Status'].str.contains('Schedule Call').sum()
 
-#   # Get board details
-#   board = monday.boards.get_board(board_id)
+def general_overview_print():
+    print("\n\033[4mGeneral Overview\033[0m")
+    print(f"Initial DD Count: {intial_dd_count}")
+    print(f"Get Intro Count: {get_intro_count}")
+    print(f"2nd Opinion Count: {opinion_count}")
+    print(f"Schedule Call Count: {schedule_call_count}\n")
 
-#   # Send board details to user
-#   bot.send_message(chat_id=user_id, text=board)
 
-# # Set up telegram bot updates
-# updater = telegram.ext.Updater(token='YOUR_TELEGRAM_BOT_TOKEN')
-# updater.dispatcher.add_handler(telegram.ext.MessageHandler(telegram.ext.Filters.text, handle_input))
-# updater.start_polling()
+#######################s####################################
 
-# Import the necessary modules and classes
-from monday import Client
+# Create a general overview of which deals are assigned to which person and the number of deals per person
+# Create dictionary that assigns deals to repsective individuals and print out this overview
+d = [dict(zip(["Deals", "Person"], item)) for item in data]
 
-# Initialize the Client object with your API key
-monday = Client(api_key="eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjIwNTEwMjMyMywidWlkIjozNzEwMjA4OSwiaWFkIjoiMjAyMi0xMi0wNVQyMjoxNzo1OS4wNDlaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTQzNjU4NTEsInJnbiI6InVzZTEifQ.Lz7fOIv3WG1iGxkeNrSo4n1xz0q2Vt--5y9ZvVhA2cc")
+dict_person_deals = defaultdict(list)
 
-# Fetch the list of boards in your account
-boards = monday.boards.get_all()
+for item in d:
+    dict_person_deals[item['Person']].append(item['Deals'])
 
-# Iterate over the list of boards
-for board in boards:
-    # Fetch the list of items on the board
-    items = board.items.get_all()
+def count_len_dict(person):
+    """
+    a function that counts the number of values per key (the number of deals assigned to the person)
+    """
+    count = len(dict_person_deals.get(person))
+    return count
 
-    # Iterate over the list of items
-    for item in items:
-        # Fetch the details of the item
-        item_details = item.get()
 
-        # Print the item's name and description
-        print(f"Item: {item_details.name}")
-        print(f"Description: {item_details.description}")
+###########################################################
+
+# create a dictionary that contains the person, the deals and the status of these deals and print out this overview
+d1 = [dict(zip(["Deals", "Person","Status"], item)) for item in data]
+
+dict_status_deals = defaultdict(list)
+
+# Group by status by adding the deals (value) to the status (key)
+for item in d1:
+    dict_status_deals[item['Status']].append(item['Deals'])
+
+def count_len_stat(status):
+    """
+    a function that counts the number of values per key (the number of deals assigned to the person)
+    """
+    count = len(dict_status_deals.get(status))
+    return count
+
+
+###########################################################
+
+# create a dictionary that contains the person, the status of their deals, and print out this overview
+d2 = [dict(zip(["Deals","Person", "Status"], item)) for item in data]
+
+dict_person_status = defaultdict(list)
+
+for item in d2:
+    dict_person_status[item['Person']].append(item['Status'])
+
+def count_status(person, status):
+    """
+    A function that counts the number of times a STATUS repeats itself in a list (value) assigned to a PERSON (key)
+    """
+    count = dict_person_status.get(person).count(status)
+    return count
+
+
+###############################################################
+
+# final function that ties everything back together
+
+def final_print():
+    people = list(set(df['Person'].values.tolist()))
+    # print this for the number of people listed
+    num_items = len(people)
+    for i in range(num_items):
+        print(f"DAILY UPDATE\n")
+        print(f"""\n\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
+
+
+if __name__ == '__main__':
+    final_print()
+    general_overview_print()
