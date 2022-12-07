@@ -5,6 +5,9 @@ from collections import defaultdict
 from config import apiKey, apiUrl
 from datetime import datetime, timedelta
 import colorama
+import io
+import telegram
+from contextlib import redirect_stdout
 
 # Import core data
 
@@ -38,7 +41,6 @@ def general_overview_print():
     print(f"Get Intro Count: {get_intro_count}")
     print(f"2nd Opinion Count: {opinion_count}")
     print(f"Schedule Call Count: {schedule_call_count}\n")
-
 
 #######################s####################################
 
@@ -148,6 +150,15 @@ for date_diff in date_differences:
         # Increment the counter
             counter += 1
 
+# telegram bot message
+
+
+message = "General Overview\n"
+message += "Initial DD past 48 hours: {}\n".format(counter)
+message += "Initial DD Count: {}\n".format(intial_dd_count)
+message += "Get Intro Count: {}\n".format(get_intro_count)
+message += "2nd Opinion Count: {}\n".format(opinion_count)
+message += "Schedule Call Count: {}\n".format(schedule_call_count)
 ###############################################################
 
 # final function that ties everything back together
@@ -159,8 +170,42 @@ def final_print():
     for i in range(num_items):
         print(f"""\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
 
+def telegram_final_print():
+    people = list(set(df['Person'].values.tolist()))
+    # print this for the number of people listed
+    num_items = len(people)
+    for i in range(num_items):
+        person = people[i]
+        PersonalDeals = (
+            f"""{person}\033\nTotal Deals: {count_len_dict(person)}\n"""
+            f"""Initial DD: {count_status(person, 'Initial DD')}\n"""
+            f"""Get Intro: {count_status(person, 'Get Intro')}\n"""
+            f"""Need 2nd Opinion: {count_status(person, 'Need 2nd Opinion')}\n"""
+            f"""Deals: {dict_person_deals.get(person)}\n"""
+        )
+        bot.send_message(chat_id=5312406635, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
+
+# telegram bot
+
+bot = telegram.Bot(token="5910533175:AAHLIQvzwTut8ISC0WfMuy7VS5BuaZM8vy0")
+
+updates = bot.get_updates()
+for update in updates:
+    if update.message:
+        user_name = update.message.from_user.first_name
+bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
+
+# Send the table to the user
+bot.send_message(chat_id=5312406635, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+
+# This allows me to obtain the chatID of the relevant Telegram user as long as they interact with our telegram bot: RubberBot
+'''updates = bot.get_updates()
+for update in updates:
+    print(update)'''
+
 
 if __name__ == '__main__':
     print(f"\n ~ DAILY UPDATE ~ ")
     general_overview_print()
     final_print()
+    telegram_final_print()
