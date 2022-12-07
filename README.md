@@ -41,6 +41,11 @@ The key challenge here was to figure out how to find the number of deals per per
 
 Initially, we considered building a web app, however, OP Crypto mentioned that they mainly use Telegram as an internal communication tool and therefore saw it as a challenge to not only work with one API (Monday.com) but two. Instead of giving these statistics on a web app, we created a telegram bot that sent out messages to update the deal team on the output of our python model.
 
+Here is how you can set the python script to run everyday at a specified time, this is what automates the daily process.
+
+![image](https://user-images.githubusercontent.com/27936494/206093775-ae44037b-bd19-4917-a19b-f2721c2e7c7e.png)
+
+
 Issues we faced:
 
 Our first significant issue was dealing with importing the monday module, because upon using the monday module, an import error would pop up indicating that there is a possible issue with “circular input” within the file storage. We used a beta version of an AI search engine called Chat GPT to attempt and solve this issue. This is where we spent a bulk of our time attempting to debug, using the command pip freeze to see what has been installed and then further looking at where everything is stored on the laptop. Another solution we found was to import the Monday-sdk-module which for some reason never ended up properly installing on either device. We finally found solace another way by using the API key to query the code via a JSON file. This forced us to learn how to query the appropriate data but was done easily.
