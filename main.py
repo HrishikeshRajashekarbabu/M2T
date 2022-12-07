@@ -3,6 +3,8 @@ import json
 import pandas as pd
 from collections import defaultdict
 from config import apiKey, apiUrl
+from datetime import datetime, timedelta
+import colorama
 
 # Import core data
 
@@ -17,6 +19,8 @@ json_data = json.loads(requests.post(url=apiUrl, json=data, headers=headers).tex
 data = [ [item['name']]+[c_v['text'] for c_v in item['column_values']] for item in json_data['data']['boards'][0]['items']]
 df = pd.DataFrame(data,columns=['Deals','Person','Status','Date'])
 
+# Initialize the colorama module
+colorama.init()
 
 ###########################################################
 
@@ -29,6 +33,7 @@ schedule_call_count = df['Status'].str.contains('Schedule Call').sum()
 
 def general_overview_print():
     print("\n\033[4mGeneral Overview\033[0m")
+    print(f'Initial DD past 48 hours: {colorama.Style.BRIGHT}{colorama.Fore.RED}{counter}{colorama.Style.RESET_ALL}') # Source: https://chat.openai.com/chat
     print(f"Initial DD Count: {intial_dd_count}")
     print(f"Get Intro Count: {get_intro_count}")
     print(f"2nd Opinion Count: {opinion_count}")
@@ -90,6 +95,58 @@ def count_status(person, status):
     count = dict_person_status.get(person).count(status)
     return count
 
+###########################################################
+
+# DATE SECTION
+
+# Find the number of Initial DD's that are older than 48hrs:
+# create a dictionary that contains the person, the status of their deals, the date of the deal and finds "Initial DD" deals 
+# that are older than 48hrs and prints the total
+d3 = [dict(zip(["Deals","Person", "Status", "Date"], item)) for item in data]
+
+# create a function that filters for "Initial DD" only
+
+dict_deal_age = defaultdict(list)
+
+# create a function that calculate the age of a deal
+
+def date_extractor():
+    for item in d3:
+        dict_deal_age[item['Deals']].append(item['Date'])
+
+date_extractor()
+
+# Specify the key for the values to extract from dict_deal_age
+initial_dd_keys = dict_status_deals['Initial DD']
+dates_initial_dd = dict_deal_age.items()
+values_initial_dd = [value for (key, value) in dates_initial_dd if key in initial_dd_keys]
+
+# turn the above list of lists into a single list of date strings
+single_value_list = []
+
+# Using the += operator to add dates from deals in Initial DD to the above list
+for sublist in values_initial_dd:
+    single_value_list += sublist
+
+# List of datetime objects
+date_objects = [datetime.strptime(date_string, '%Y-%m-%d') for date_string in single_value_list]
+
+# Get the current date and time
+current_date = datetime.now()
+
+# Find the difference between each date in the list and the current date
+date_differences = [current_date - date for date in date_objects]
+
+# Initialize a counter
+counter = 0
+
+# Iterate over the list of date differences
+for date_diff in date_differences:
+    # Check if the number of days in the date difference is greater than 2
+    if date_diff.days >= 2:
+        if date_diff.seconds > 0:
+        # Increment the counter
+            counter += 1
 
 ###############################################################
 
@@ -100,10 +157,10 @@ def final_print():
     # print this for the number of people listed
     num_items = len(people)
     for i in range(num_items):
-        print(f"DAILY UPDATE\n")
-        print(f"""\n\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
+        print(f"""\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
 
 
 if __name__ == '__main__':
-    final_print()
+    print(f"\n ~ DAILY UPDATE ~ ")
     general_overview_print()
+    final_print()
