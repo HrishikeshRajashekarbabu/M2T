@@ -17,11 +17,21 @@ There are several python packages and modules that we used that require installa
 4. Colorama
 5. Collections
 
+Implementation Information
+
+For finding your Monday.com API Developer key. Go to your Monday.com dashboard, click on the bottom left icon highlighting your initials, then Developers > Developer > My Access Tokens
+
+For getting your Telegram.com API KEY. Open Telegram, message botfather - /start - followed by - /newbot - This will allow you to name your bot and then the API token will be given to you
+
+![image](https://user-images.githubusercontent.com/27936494/206089428-603dac73-2d03-419b-8445-6bbe7c42e871.png)
+
 Issues we faced:
 
 Our first significant issue was dealing with importing the monday module, because upon using the monday module, an import error would pop up indicating that there is a possible issue with “circular input” within the file storage. We used a beta version of an AI search engine called Chat GPT to attempt and solve this issue. This is where we spent a bulk of our time attempting to debug, using the command pip freeze to see what has been installed and then further looking at where everything is stored on the laptop. Another solution we found was to import the Monday-sdk-module which for some reason never ended up properly installing on either device. We finally found solace another way by using the API key to query the code via a JSON file. This forced us to learn how to query the appropriate data but was done easily.
 
-Another issue was with how Monday.com used GraphQL to display its data to developers. We had to query our requests using JSON data structures which took a while to understand. We were disappointed that Monday.com doesn't store its "items" underneath "groups" as this restricted us from structuring our data under different groups in the dashboard, this would've made our piecing together our output a lot easier. We circumvented this by creating aggregator functions which grouped the data together under its respective headers.
+Another issue was with how Monday.com used GraphQL to display its data to developers. We had to query our requests using JSON data structures which took a while to understand. We were disappointed that Monday.com doesn't store its "items" underneath "groups" (Image 1 in Appendix) as this restricted us from structuring our data under different groups in the dashboard, this would've made our piecing together our output a lot easier. We circumvented this by creating aggregator functions which grouped the data together under its respective headers.
 
-![image](https://user-images.githubusercontent.com/27936494/206085482-feb6fcf9-c47a-49ac-bb33-f39a869acee7.png)
+Appendix:
+Image 1: ![image](https://user-images.githubusercontent.com/27936494/206085792-885024bf-e703-482f-8490-56c99fb58952.png)
+
 
