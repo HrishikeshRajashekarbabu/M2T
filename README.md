@@ -23,15 +23,27 @@ For finding your Monday.com API Developer key. Go to your Monday.com dashboard, 
 
 For getting your Telegram.com API KEY. Open Telegram, message botfather - /start - followed by - /newbot - This will allow you to name your bot and then the API token will be given to you
 
-![image](https://user-images.githubusercontent.com/27936494/206089428-603dac73-2d03-419b-8445-6bbe7c42e871.png)
+![image](https://user-images.githubusercontent.com/27936494/206092708-434b58bc-169f-40cc-b7f4-b0b8878a54d0.png)
 
 Results :
 
-Very happy with our results, it sends the required informations.
+Very happy with our results, it sends the maximum amount of relvant/required information from Monday.com to Telegram user groups
 
-![image](https://user-images.githubusercontent.com/27936494/206090470-d6ae517d-3e55-4059-bf5e-5be13295a000.png)
+![image](https://user-images.githubusercontent.com/27936494/206092464-519e40f2-87b2-4ca2-b83e-297a565d5a5b.png)
 
 Project Evolution:
+
+To begin with, we knew that we wanted to create a practical tool that solved a real issue within a professional organization. Given a member of the team works at a VC, we were well aware of administrative / workforce management process flow that could be automated. We spoke to OP Crypto VC about what some issues that were low hanging fruit, could be automated and used a lot of time and we realized that the daily updates (currently done manually, could be automated). There was a specific focus on Initial Due Diligence deals that had not been reviewed over the past 48 hours to ensure that they maintain a speedy pace (the essence of winning new deals and staying competitive in the world of VC).
+
+Initially, we wanted to solely focus on updating the general team about the number of deals that had not been reviewed for the past 48 hours however as we started coding, we realized there was more we could offer. To begin with, the Monday API gave us all the data we needed to grab important statistics of the workflow board that could be collected to give a general overview of the current state of the deal process (e.g. number of deals labeled Initial DD, number of deals per person, number of deals labeled Get Intro). We also realized that we could automate personal statistics where we could give a broad overview of high level statistics and then list key KPIs on a per team member basis (that is on the Monday.com board). 
+
+The key challenge here was to figure out how to find the number of deals per person labeled Initial DD that were older than 48 hours - which ended up taking a long time to debug. At one point, we considered removing this element and keeping it high level (total number of Initial Deals past 48 hours) but after a phone call with OP Crypto VC, they stressed that they wanted it on a per person basis. Eventually, we were able to figure this out.
+
+Initially, we considered building a web app, however, OP Crypto mentioned that they mainly use Telegram as an internal communication tool and therefore saw it as a challenge to not only work with one API (Monday.com) but two. Instead of giving these statistics on a web app, we created a telegram bot that sent out messages to update the deal team on the output of our python model.
+
+Here is how you can set the python script to run everyday at a specified time, this is what automates the daily process.
+
+![image](https://user-images.githubusercontent.com/27936494/206093775-ae44037b-bd19-4917-a19b-f2721c2e7c7e.png)
 
 
 Issues we faced:
