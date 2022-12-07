@@ -23,7 +23,7 @@ For finding your Monday.com API Developer key. Go to your Monday.com dashboard, 
 
 For getting your Telegram.com API KEY. Open Telegram, message botfather - /start - followed by - /newbot - This will allow you to name your bot and then the API token will be given to you
 
-![image](https://user-images.githubusercontent.com/27936494/206089428-603dac73-2d03-419b-8445-6bbe7c42e871.png)
+![image](https://user-images.githubusercontent.com/27936494/206092708-434b58bc-169f-40cc-b7f4-b0b8878a54d0.png)
 
 Results :
 
