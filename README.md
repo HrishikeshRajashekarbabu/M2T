@@ -25,6 +25,15 @@ For getting your Telegram.com API KEY. Open Telegram, message botfather - /start
 
 ![image](https://user-images.githubusercontent.com/27936494/206089428-603dac73-2d03-419b-8445-6bbe7c42e871.png)
 
+Results :
+
+Very happy with our results, it sends the required informations.
+
+![image](https://user-images.githubusercontent.com/27936494/206090470-d6ae517d-3e55-4059-bf5e-5be13295a000.png)
+
+Project Evolution:
+
+
 Issues we faced:
 
 Our first significant issue was dealing with importing the monday module, because upon using the monday module, an import error would pop up indicating that there is a possible issue with “circular input” within the file storage. We used a beta version of an AI search engine called Chat GPT to attempt and solve this issue. This is where we spent a bulk of our time attempting to debug, using the command pip freeze to see what has been installed and then further looking at where everything is stored on the laptop. Another solution we found was to import the Monday-sdk-module which for some reason never ended up properly installing on either device. We finally found solace another way by using the API key to query the code via a JSON file. This forced us to learn how to query the appropriate data but was done easily.
