@@ -101,10 +101,6 @@ def count_status(person, status):
     return count
 
 
-###########################################################
-
-# DATE SECTION
-
 # Find the number of Initial DD's that are older than 48hrs:
 # create a dictionary that contains the person, the status of their deals, the date of the deal and finds "Initial DD" deals 
 # that are older than 48hrs and prints the total
