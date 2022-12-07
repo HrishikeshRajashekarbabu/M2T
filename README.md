@@ -27,12 +27,17 @@ For getting your Telegram.com API KEY. Open Telegram, message botfather - /start
 
 Results :
 
-Very happy with our results, it sends the required informations.
+Very happy with our results, it sends the maximum amount of relvant/required information from Monday.com to Telegram user groups
 
-![image](https://user-images.githubusercontent.com/27936494/206090470-d6ae517d-3e55-4059-bf5e-5be13295a000.png)
+![image](https://user-images.githubusercontent.com/27936494/206092464-519e40f2-87b2-4ca2-b83e-297a565d5a5b.png)
 
 Project Evolution:
 
+To begin with, we knew that we wanted to create a practical tool that solved a real issue within a professional organization. Given a member of the team works at a VC, we were well aware of administrative / workforce management process flow that could be automated. We spoke to OP Crypto VC about what some issues that were low hanging fruit, could be automated and used a lot of time and we realized that the daily updates (currently done manually, could be automated). There was a specific focus on Initial Due Diligence deals that had not been reviewed over the past 48 hours to ensure that they maintain a speedy pace (the essence of winning new deals and staying competitive in the world of VC).
+
+Initially, we wanted to solely focus on updating the general team about the number of deals that had not been reviewed for the past 48 hours however as we started coding, we realized there was more we could offer. To begin with, the Monday API gave us all the data we needed to grab important statistics of the workflow board that could be collected to give a general overview of the current state of the deal process (e.g. number of deals labeled Initial DD, number of deals per person, number of deals labeled Get Intro). We also realized that we could automate personal statistics where we could give a broad overview of high level statistics and then list key KPIs on a per team member basis (that is on the Monday.com board). 
+
+The key challenge here was to figure out how to find the number of deals per person labeled Initial DD that were older than 48 hours - which ended up taking a long time to debug. At one point, we considered removing this element and keeping it high level (total number of Initial Deals past 48 hours) but after a phone call with OP Crypto VC, they stressed that they wanted it on a per person basis. Eventually, we were able to figure this out.
 
 Issues we faced:
 
