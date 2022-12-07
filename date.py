@@ -1,7 +1,10 @@
+# Figure out the date
+
 import requests
 import json
 import pandas as pd
 from collections import defaultdict
+from datetime import datetime
 
 # Import core data
 
@@ -36,9 +39,6 @@ def general_overview_print():
     print(f"2nd Opinion Count: {opinion_count}")
     print(f"Schedule Call Count: {schedule_call_count}\n")
 
-print(general_overview_print())
-
-
 ###########################################################
 
 # Create a general overview of which deals are assigned to which person and the number of deals per person
@@ -56,13 +56,6 @@ def count_len_dict(person):
     """
     count = len(dict_person_deals.get(person))
     return count
-
-# print(f"""
-# \n\033[4mIndividual Pipeline:\033[0m
-# Hrishi's deals:{dict_list.get('Hrishi')}
-# Total deals: {count_len_dict('Hrishi')}\n
-# Mads's deals:{dict_list.get('mpedersen1@babson.edu')}
-# Total deals: {count_len_dict('mpedersen1@babson.edu')}\n""")
 
 
 ###########################################################
@@ -107,37 +100,12 @@ def count_status(person, status):
     count = dict_person_status.get(person).count(status)
     return count
 
-# print(f"""
-# \033[4mHrishi:\033[0m
-# Initial DD: {count_status('Hrishi', 'Initial DD')}
-# Need 2nd Opinion: {count_status('Hrishi', 'Need 2nd Opinion')}
-# Get Intro: {count_status('Hrishi', 'Get Intro')}\n
-# \033[4mMads:\033[0m
-# Initial DD: {count_status('mpedersen1@babson.edu', 'Initial DD')}
-# Need 2nd Opinion: {count_status('mpedersen1@babson.edu', 'Need 2nd Opinion')}
-# Get Intro: {count_status('mpedersen1@babson.edu', 'Get Intro')}\n
-# """)
-
-
-
-print(f"""
-\033[4mIndivivdual Pipelines\033[0m\n
-Hrishi:
-Total Deals: {count_len_dict('Hrishi')}
-Initial DD: {count_status('Hrishi', 'Initial DD')}
-Get Intro: {count_status('Hrishi', 'Get Intro')}
-Need 2nd Opinion: {count_status('Hrishi', 'Need 2nd Opinion')}
-Deals: {dict_person_deals.get('Hrishi')}\n
-Mads:
-Total Deals: {count_len_dict('mpedersen1@babson.edu')}
-Initial DD: {count_status('mpedersen1@babson.edu', 'Initial DD')}
-Get Intro: {count_status('mpedersen1@babson.edu', 'Get Intro')}
-Need 2nd Opinion: {count_status('mpedersen1@babson.edu', 'Need 2nd Opinion')}
-Deals: {dict_person_deals.get('mpedersen1@babson.edu')}\n
-""")
-
-
 ###########################################################
+
+
+
+
+
 
 # Find the number of Initial DD's that are older than 48hrs:
 # create a dictionary that contains the person, the status of their deals, the date of the deal and finds "Initial DD" deals 
@@ -156,4 +124,33 @@ def date_extractor():
 
 date_extractor()
 
-print(dict_deal_age)
+# Specify the key for the values to extract from dict_deal_age
+initial_dd_keys = dict_status_deals['Initial DD']
+dates_initial_dd = dict_deal_age.items()
+values_initial_dd = [value for (key, value) in dates_initial_dd if key in initial_dd_keys]
+# turn the above list of lists into a single list
+single_value_list = []
+# Using the += operator
+for sublist in values_initial_dd:
+    single_value_list += sublist
+
+# Using datetime module to calculate age of initial DD deal
+# List of date objects
+date_list = []
+
+# Loop through the string dates and parse them to create datetime objects
+for string_date in single_value_list:
+  date = datetime.strptime(string_date, '%Y-%m-%d')
+  date_list.append(date)
+
+# Get the current date
+current_date = datetime.now().date()
+
+# Loop through the dates and calculate the difference in days
+# for date in date_list:
+#   diff = date - current_date
+#   print(f'{date} is {diff.days} days from the current date.')
+
+print(current_date)
+print(date_list)
+print(single_value_list)
