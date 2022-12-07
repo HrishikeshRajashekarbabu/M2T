@@ -5,6 +5,9 @@ from collections import defaultdict
 from config import apiKey, apiUrl
 from datetime import datetime, timedelta
 import colorama
+import io
+import telegram
+from contextlib import redirect_stdout
 
 # Import core data
 
@@ -38,7 +41,6 @@ def general_overview_print():
     print(f"Get Intro Count: {get_intro_count}")
     print(f"2nd Opinion Count: {opinion_count}")
     print(f"Schedule Call Count: {schedule_call_count}\n")
-
 
 #######################s####################################
 
@@ -148,6 +150,72 @@ for date_diff in date_differences:
         # Increment the counter
             counter += 1
 
+# extract the initial DD deals and return a list
+initial_dd_deals = dict_status_deals.get("Initial DD")
+
+### MATCH PERSON WITH DATE OF THEIR INITIAL DD PIPELINE ###
+
+# create a dictionary to add these deals as keys with no values ... yet
+new_dict = {}
+for key in initial_dd_deals:
+    new_dict[key] = None
+
+# Initialize the name_date dictionary
+name_date = {}
+
+# Get the names of the deals with the "Initial DD" status
+initial_dd_deal_names = [deal for deal in dict_status_deals['Initial DD']]
+
+# Iterate through the initial_dd_deal_names
+for deal_name in initial_dd_deal_names:
+    # Use the dict_deal_age dictionary to get the date for this deal
+    date = dict_deal_age[deal_name][0]
+    
+    # Iterate through the dict_person_deals dictionary
+    for person, deals in dict_person_deals.items():
+        # If this person is associated with the current deal, add the date
+        # to the name_date dictionary for this person
+        if deal_name in deals:
+            if person not in name_date:
+                name_date[person] = [date]
+            else:
+                name_date[person].append(date)
+
+### FIND OUT IF THE DEALS ARE OLDER THAN 48 HOURS (and flag is so)
+
+# Get the current date and time
+current_date = datetime.now()
+
+# Create a timedelta object representing 48 hours
+delta = timedelta(hours=48)
+
+def late_dd():
+    # Loop through the keys in name_date
+    for key in name_date:
+    # Create a counter to keep track of how many dates are older than 48 hours from current_date
+        count = 0
+  
+        # Loop through the list of dates for the current key
+        for date_string in name_date[key]:
+            # Parse the date string into a datetime object
+            date = datetime.strptime(date_string, '%Y-%m-%d')
+    
+            # Check if the date is older than 48 hours from current_date
+            if date < current_date - delta:
+            # If so, increment the counter
+                count += 1
+  
+        # Print the count for the current key
+        print(f"{key}: {count}")
+
+
+# telegram bot message
+message = "General Overview\n"
+message += "Initial DD past 48 hours: {}\n".format(counter)
+message += "Initial DD Count: {}\n".format(intial_dd_count)
+message += "Get Intro Count: {}\n".format(get_intro_count)
+message += "2nd Opinion Count: {}\n".format(opinion_count)
+message += "Schedule Call Count: {}\n".format(schedule_call_count)
 ###############################################################
 
 # final function that ties everything back together
@@ -157,10 +225,46 @@ def final_print():
     # print this for the number of people listed
     num_items = len(people)
     for i in range(num_items):
-        print(f"""\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
+        print(f"""\n\033[4m{people[i]}\033[0m\nTotal Deals: {count_len_dict(people[i])}\nInitial DD: {count_status(people[i],'Initial DD')}\nGet Intro: {count_status(people[i], 'Get Intro')}\nNeed 2nd Opinion: {count_status(people[i], 'Need 2nd Opinion')}\nDeals: {dict_person_deals.get(people[i])}\n""")
+
+def telegram_final_print():
+    people = list(set(df['Person'].values.tolist()))
+    # print this for the number of people listed
+    num_items = len(people)
+    for i in range(num_items):
+        person = people[i]
+        PersonalDeals = (
+            f"""{person}\033\nTotal Deals: {count_len_dict(person)}\n"""
+            f"""Initial DD: {count_status(person, 'Initial DD')}\n"""
+            f"""Get Intro: {count_status(person, 'Get Intro')}\n"""
+            f"""Need 2nd Opinion: {count_status(person, 'Need 2nd Opinion')}\n"""
+            f"""Deals: {dict_person_deals.get(person)}\n"""
+        )
+        bot.send_message(chat_id=5312406635, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
+
+# telegram bot
+
+bot = telegram.Bot(token="5910533175:AAHLIQvzwTut8ISC0WfMuy7VS5BuaZM8vy0")
+
+updates = bot.get_updates()
+for update in updates:
+    if update.message:
+        user_name = update.message.from_user.first_name
+bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
+
+# Send the table to the user
+bot.send_message(chat_id=5312406635, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+
+# This allows me to obtain the chatID of the relevant Telegram user as long as they interact with our telegram bot: RubberBot
+'''updates = bot.get_updates()
+for update in updates:
+    print(update)'''
 
 
 if __name__ == '__main__':
     print(f"\n ~ DAILY UPDATE ~ ")
     general_overview_print()
+    print("\033[4mInitial Past 48 Hours\033[0m")
+    late_dd()
     final_print()
+    telegram_final_print()
