@@ -208,6 +208,39 @@ def late_dd():
         # Print the count for the current key
         print(f"{key}: {count}")
 
+# telegram bot
+
+bot = telegram.Bot(telegram_token)
+
+updates = bot.get_updates()
+for update in updates:
+    if update.message:
+        user_name = update.message.from_user.first_name
+bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
+
+def telegram_dd():
+    bot = telegram.Bot(telegram_token)
+    bot.send_message(chat_id=5312406635, text="Number of Initial DD older than 48 hours:", parse_mode=telegram.ParseMode.MARKDOWN)
+    # Loop through the keys in name_date
+    for key in name_date:
+    # Create a counter to keep track of how many dates are older than 48 hours from current_date
+        count = 0
+  
+        # Loop through the list of dates for the current key
+        for date_string in name_date[key]:
+            # Parse the date string into a datetime object
+            date = datetime.strptime(date_string, '%Y-%m-%d')
+    
+            # Check if the date is older than 48 hours from current_date
+            if date < current_date - delta:
+            # If so, increment the counter
+                count += 1
+  
+        # Print the count for the current key
+        output = (f"{key}: {count}")
+        bot.send_message(chat_id=5312406635, text=output, parse_mode=telegram.ParseMode.MARKDOWN)
+
+telegram_dd()
 
 # telegram bot message
 message = "General Overview\n"
@@ -241,16 +274,6 @@ def telegram_final_print():
             f"""Deals: {dict_person_deals.get(person)}\n"""
         )
         bot.send_message(chat_id=5312406635, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
-
-# telegram bot
-
-bot = telegram.Bot(telegram_token)
-
-updates = bot.get_updates()
-for update in updates:
-    if update.message:
-        user_name = update.message.from_user.first_name
-bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
 
 # Send the table to the user
 bot.send_message(chat_id=5312406635, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
