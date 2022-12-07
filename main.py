@@ -2,7 +2,7 @@ import requests
 import json
 import pandas as pd
 from collections import defaultdict
-from config import apiKey, apiUrl
+from config import apiKey, apiUrl, telegram_token
 from datetime import datetime, timedelta
 import colorama
 import io
@@ -244,7 +244,7 @@ def telegram_final_print():
 
 # telegram bot
 
-bot = telegram.Bot(token="5910533175:AAHLIQvzwTut8ISC0WfMuy7VS5BuaZM8vy0")
+bot = telegram.Bot(telegram_token)
 
 updates = bot.get_updates()
 for update in updates:
