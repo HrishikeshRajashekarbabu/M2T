@@ -4,7 +4,7 @@ import requests
 import json
 import pandas as pd
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import core data
 
@@ -100,12 +100,8 @@ def count_status(person, status):
     count = dict_person_status.get(person).count(status)
     return count
 
+
 ###########################################################
-
-
-
-
-
 
 # Find the number of Initial DD's that are older than 48hrs:
 # create a dictionary that contains the person, the status of their deals, the date of the deal and finds "Initial DD" deals 
@@ -128,29 +124,33 @@ date_extractor()
 initial_dd_keys = dict_status_deals['Initial DD']
 dates_initial_dd = dict_deal_age.items()
 values_initial_dd = [value for (key, value) in dates_initial_dd if key in initial_dd_keys]
-# turn the above list of lists into a single list
+
+# turn the above list of lists into a single list of date strings
 single_value_list = []
-# Using the += operator
+
+# Using the += operator to add dates from deals in Initial DD to the above list
 for sublist in values_initial_dd:
     single_value_list += sublist
 
-# Using datetime module to calculate age of initial DD deal
-# List of date objects
-date_list = []
+# List of datetime objects
+date_objects = [datetime.strptime(date_string, '%Y-%m-%d') for date_string in single_value_list]
 
-# Loop through the string dates and parse them to create datetime objects
-for string_date in single_value_list:
-  date = datetime.strptime(string_date, '%Y-%m-%d')
-  date_list.append(date)
+# Get the current date and time
+current_date = datetime.now()
 
-# Get the current date
-current_date = datetime.now().date()
+# Find the difference between each date in the list and the current date
+date_differences = [current_date - date for date in date_objects]
 
-# Loop through the dates and calculate the difference in days
-# for date in date_list:
-#   diff = date - current_date
-#   print(f'{date} is {diff.days} days from the current date.')
+# Initialize a counter
+counter = 0
 
-print(current_date)
-print(date_list)
-print(single_value_list)
+# Iterate over the list of date differences
+for date_diff in date_differences:
+    # Check if the number of days in the date difference is greater than 2
+    if date_diff.days >= 2:
+        if date_diff.seconds > 0:
+        # Increment the counter
+            counter += 1
+
+# Print the final value of the counter
+print(f'Initial DD past 48 hours: {counter}')
