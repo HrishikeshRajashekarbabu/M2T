@@ -273,7 +273,7 @@ def telegram_final_print():
             f"""Need 2nd Opinion: {count_status(person, 'Need 2nd Opinion')}\n"""
             f"""Deals: {dict_person_deals.get(person)}\n"""
         )
-        bot.send_message(chat_id=5312406635, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
+        bot.send_message(chat_id=update.message.chat_id, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # Send the table to the user
 bot.send_message(chat_id=update.message.chat_id, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
