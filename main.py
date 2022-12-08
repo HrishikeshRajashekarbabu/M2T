@@ -220,7 +220,7 @@ bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_na
 
 def telegram_dd():
     bot = telegram.Bot(telegram_token)
-    bot.send_message(chat_id=5312406635, text="Number of Initial DD older than 48 hours:", parse_mode=telegram.ParseMode.MARKDOWN)
+    bot.send_message(chat_id=update.message.chat_id, text="Number of Initial DD older than 48 hours:", parse_mode=telegram.ParseMode.MARKDOWN)
     # Loop through the keys in name_date
     for key in name_date:
     # Create a counter to keep track of how many dates are older than 48 hours from current_date
@@ -238,7 +238,7 @@ def telegram_dd():
   
         # Print the count for the current key
         output = (f"{key}: {count}")
-        bot.send_message(chat_id=5312406635, text=output, parse_mode=telegram.ParseMode.MARKDOWN)
+        bot.send_message(chat_id=update.message.chat_id, text=output, parse_mode=telegram.ParseMode.MARKDOWN)
 
 telegram_dd()
 
@@ -276,7 +276,7 @@ def telegram_final_print():
         bot.send_message(chat_id=5312406635, text=PersonalDeals, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # Send the table to the user
-bot.send_message(chat_id=5312406635, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+bot.send_message(chat_id=update.message.chat_id, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
 
 # This allows me to obtain the chatID of the relevant Telegram user as long as they interact with our telegram bot: RubberBot
 '''updates = bot.get_updates()
