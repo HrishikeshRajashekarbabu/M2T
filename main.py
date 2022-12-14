@@ -213,10 +213,11 @@ def late_dd():
 bot = telegram.Bot(telegram_token)
 
 updates = bot.get_updates()
+print(updates)
 for update in updates:
     if update.message:
         user_name = update.message.from_user.first_name
-bot.send_message(chat_id=update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
+bot.send_message(chat_id = update.message.chat_id, text="Good Evening, " + user_name + "!" + "\n" + "Here are your updates for the day: ")
 
 def telegram_dd():
     bot = telegram.Bot(telegram_token)
